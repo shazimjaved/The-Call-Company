@@ -105,14 +105,6 @@ Visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
 
 ---
 
-## 👤 Age Restrictions
-
-- Users under 18: £15/month spending cap and age-restricted content by default.
-
----
-
-
-
 ## 🤝 Contributing
 
 Pull requests and suggestions are welcome!  
