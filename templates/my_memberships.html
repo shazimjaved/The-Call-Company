@@ -1,0 +1,181 @@
+{% extends "layout.html" %}
+{% block title %}My Memberships{% endblock %}
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <h2>My Memberships</h2>
+    {% if memberships %}
+        <div class="memberships-list">
+            {% for member in memberships %}
+            <div class="membership-card">
+                <div class="membership-header">
+                    <span class="id-label">ID:</span>
+                    <span class="membership-id" id="membershipId{{ loop.index }}">{{ member.id }}</span>
+                    <button class="copy-btn" onclick="copyId('membershipId{{ loop.index }}')" title="Copy ID">📋</button>
+                </div>
+                <div class="membership-details">
+                    <div class="detail-row"><span class="icon">👤</span> <span class="label">Name:</span> <span class="value">{{ member.full_name }}</span></div>
+                    <div class="detail-row"><span class="icon">🏢</span> <span class="label">Plan:</span> <span class="value">{{ member.plan.provider.name }} - {{ member.plan.plan_name }}</span></div>
+                    <div class="detail-row"><span class="icon">💰</span> <span class="label">Price:</span> <span class="value">£{{ member.plan.price_per_month }}/month</span></div>
+                    <div class="detail-row"><span class="icon">💳</span> <span class="label">Payment Method:</span> <span class="value">{{ member.payment_method }}</span></div>
+                </div>
+                {% if member.spending_cap or member.age_restricted_content %}
+                <div class="restrictions-section">
+                    <span class="icon">⚠️</span> <strong>Restrictions:</strong>
+                    <ul>
+                        {% if member.spending_cap %}
+                        <li>Spending Cap: <strong>£15/month</strong></li>
+                        {% endif %}
+                        {% if member.age_restricted_content %}
+                        <li>Age-Restricted Content: <strong>Blocked</strong></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+                <div class="membership-actions">
+                    <a href="{{ url_for('member_details', member_id=member.id) }}" class="btn details-btn">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You have no memberships yet.</p>
+    {% endif %}
+</div>
+<script>
+    function copyId(elementId) {
+        var idText = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(idText);
+        alert('Membership ID copied to clipboard!');
+    }
+</script>
+<style>
+    h2 {
+        color: #fff;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .memberships-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        margin-top: 25px;
+    }
+    .membership-card {
+        background: linear-gradient(135deg, #212121 0%, #424242 100%);
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        padding: 25px 30px 18px 30px;
+        min-width: 320px;
+        flex: 1 1 350px;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 1px solid #616161;
+        color: #fff;
+    }
+    .membership-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .id-label {
+        font-weight: bold;
+        color: #e0e0e0;
+    }
+    .membership-id {
+        font-family: 'Courier New', Courier, monospace;
+        background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 1.1em;
+        letter-spacing: 1px;
+        font-weight: bold;
+    }
+    .copy-btn {
+        background: #616161;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: background 0.2s;
+        color: #fff;
+    }
+    .copy-btn:hover {
+        background: #ff5722;
+    }
+    .membership-details {
+        margin-bottom: 10px;
+    }
+    .detail-row {
+        margin-bottom: 6px;
+        font-size: 1em;
+    }
+    .icon {
+        margin-right: 5px;
+    }
+    .label {
+        font-weight: bold;
+        color: #e0e0e0;
+    }
+    .value {
+        color: #fff;
+        margin-left: 3px;
+    }
+    .restrictions-section {
+        background: linear-gradient(90deg, #212121 0%, #424242 100%);
+        border-left: 5px solid #ffc107;
+        padding: 8px 15px;
+        border-radius: 8px;
+        color: #e0e0e0;
+        margin: 10px 0 10px 0;
+        font-size: 0.98em;
+        border: 1px solid #616161;
+    }
+    .restrictions-section strong {
+        color: #ffc107;
+    }
+    .restrictions-section ul {
+        margin: 5px 0 0 20px;
+        padding: 0;
+    }
+    .restrictions-section li strong {
+        color: #ff5722;
+    }
+    .membership-actions {
+        text-align: right;
+        margin-top: 10px;
+    }
+    .btn.details-btn {
+        background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+        color: #fff;
+        padding: 8px 20px;
+        font-size: 1em;
+        border-radius: 25px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(255,87,34,0.15);
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn.details-btn:hover {
+        background: transparent;
+        color: #ff5722;
+        border: 2px solid #ff5722;
+        transform: translateY(-1px) scale(1.03);
+        box-shadow: 0 6px 16px rgba(255,87,34,0.25);
+    }
+    @media (max-width: 700px) {
+        .memberships-list {
+            flex-direction: column;
+            gap: 15px;
+        }
+        .membership-card {
+            min-width: unset;
+            padding: 15px 20px;
+        }
+    }
+</style>
+{% endblock %} 

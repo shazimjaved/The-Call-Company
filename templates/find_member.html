@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+{% block title %}Find Membership{% endblock %}
+{% block content %}
+    <div class="find-hero">
+        <h2>Find Your Membership</h2>
+        <p class="find-subtitle">Enter your membership ID to view your details.</p>
+    </div>
+    <div class="find-card">
+        <form method="POST" action="{{ url_for('find_member') }}" class="find-form">
+            <label for="member_id">Membership ID:</label>
+            <div class="find-input-row">
+                <input type="text" id="member_id" name="member_id" required placeholder="e.g. X1Y2Z3A4">
+                <button type="button" class="copy-btn" onclick="copyFromInput('member_id')" title="Copy ID">📋</button>
+            </div>
+            <button type="submit" class="btn find-btn">🔍 Find</button>
+        </form>
+        <div class="info-tip">
+            <span class="tip-icon">💡</span> <span>Tip: You can find your Membership ID in your confirmation email or My Memberships page.</span>
+        </div>
+    </div>
+    <script>
+        function copyFromInput(inputId) {
+            var input = document.getElementById(inputId);
+            if (input && input.value) {
+                navigator.clipboard.writeText(input.value);
+                alert('Membership ID copied to clipboard!');
+            }
+        }
+    </script>
+    <style>
+        .find-hero {
+            text-align: center;
+            margin: 30px 0 10px 0;
+            padding: 18px 10px 12px 10px;
+            background: linear-gradient(135deg, #212121 0%, #424242 60%, #616161 100%);
+            border-radius: 18px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            color: #fff;
+        }
+        .find-hero h2 {
+            font-size: 1.7em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .find-subtitle {
+            color: #e0e0e0;
+            font-size: 1em;
+            margin-bottom: 0;
+        }
+        .find-card {
+            background: linear-gradient(135deg, #212121 0%, #424242 100%);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            padding: 35px 30px 25px 30px;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            animation: fadeIn 0.5s;
+            border: 1px solid #616161;
+        }
+        .find-form label {
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .find-input-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .find-input-row input[type="text"] {
+            flex: 1;
+            padding: 13px 14px;
+            border: 1.5px solid #616161;
+            border-radius: 10px;
+            font-size: 1.08em;
+            background: #fff;
+            color: #212121;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        .find-input-row input[type="text"]:focus {
+            outline: none;
+            border: 1.5px solid #ff5722;
+            box-shadow: 0 0 0 3px rgba(255,87,34,0.2), 0 2px 8px rgba(255,87,34,0.1);
+        }
+        .copy-btn {
+            background: #616161;
+            border: none;
+            border-radius: 8px;
+            padding: 0 12px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            color: #fff;
+        }
+        .copy-btn:hover {
+            background: #ff5722;
+        }
+        .btn.find-btn {
+            background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 0;
+            font-size: 1.08em;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 16px rgba(255,87,34,0.15);
+            transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn.find-btn:hover {
+            background: transparent;
+            color: #ff5722;
+            border: 2px solid #ff5722;
+            box-shadow: 0 8px 24px rgba(255,87,34,0.25);
+            transform: translateY(-2px) scale(1.05);
+        }
+        .info-tip {
+            margin-top: 18px;
+            background: linear-gradient(90deg, #212121 0%, #424242 100%);
+            border-left: 5px solid #ff5722;
+            padding: 12px 18px;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #616161;
+        }
+        .tip-icon {
+            font-size: 1.3em;
+            color: #ffc107;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+{% endblock %} 

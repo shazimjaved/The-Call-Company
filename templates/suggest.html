@@ -1,0 +1,403 @@
+{% extends "layout.html" %}
+{% block title %}Suggest Best Plan{% endblock %}
+{% block content %}
+    <div class="suggest-hero">
+        <h2>Find the Best Plan for You</h2>
+        <p class="intro-text">Tell us about your needs and we'll find the perfect plan for you!</p>
+    </div>
+    <div class="suggest-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" class="suggestion-form">
+            <div class="form-group">
+                <label for="age">Your Age:</label>
+                <input type="number" id="age" name="age" min="1" max="120" required placeholder="e.g. 25" value="{{ request.form.age or '' }}">
+                <small class="help-text">We'll ensure you get age-appropriate plans</small>
+            </div>
+            <div class="form-group">
+                <label for="data_needed">Minimum Data Needed (GB):</label>
+                <input type="number" id="data_needed" name="data_needed" min="0" step="0.1" placeholder="e.g. 4" value="{{ request.form.data_needed or '' }}">
+                <small class="help-text">Enter 0 if you don't need data</small>
+            </div>
+            <div class="form-group">
+                <label for="calls_needed">Calls/Text Needed:</label>
+                <select id="calls_needed" name="calls_needed">
+                    <option value="">Select your preference</option>
+                    <option value="500/500" {% if request.form.calls_needed == '500/500' %}selected{% endif %}>Basic (500 mins/500 texts)</option>
+                    <option value="750/750" {% if request.form.calls_needed == '750/750' %}selected{% endif %}>Standard (750 mins/750 texts)</option>
+                    <option value="unl/unl" {% if request.form.calls_needed == 'unl/unl' %}selected{% endif %}>Unlimited</option>
+                </select>
+                <small class="help-text">Choose your preferred call and text allowance</small>
+            </div>
+            <div class="form-group">
+                <label for="phone_model">Preferred Phone Model (optional):</label>
+                <select id="phone_model" name="phone_model">
+                    <option value="">No phone needed</option>
+                    <option value="iPhone 14 Pro" {% if request.form.phone_model == 'iPhone 14 Pro' %}selected{% endif %}>iPhone 14 Pro</option>
+                    <option value="iPhone 14" {% if request.form.phone_model == 'iPhone 14' %}selected{% endif %}>iPhone 14</option>
+                    <option value="iPhone 13" {% if request.form.phone_model == 'iPhone 13' %}selected{% endif %}>iPhone 13</option>
+                    <option value="Samsung S22" {% if request.form.phone_model == 'Samsung S22' %}selected{% endif %}>Samsung S22</option>
+                    <option value="Samsung S21" {% if request.form.phone_model == 'Samsung S21' %}selected{% endif %}>Samsung S21</option>
+                </select>
+                <small class="help-text">Select if you want a plan with a phone</small>
+            </div>
+            <button type="submit" class="btn suggest-plan">🎯 Find My Perfect Plan</button>
+        </form>
+        <div class="info-tip">
+            <span class="tip-icon">💡</span> <span>Tip: You can use the search box for quick keyword search, or fill the form for a personalized suggestion!</span>
+        </div>
+    </div>
+
+    {% if suggested_plan %}
+        <div class="suggested-plan-card">
+            <div class="plan-header">
+                <h3>Perfect Match Found! 🎉</h3>
+                <p>Here's the best plan based on your requirements:</p>
+            </div>
+            
+            <div class="plan-details">
+                <div class="provider-info">
+                    <span class="provider-badge">{{ suggested_plan.provider.name }}</span>
+                    <h4>{{ suggested_plan.plan_name }}</h4>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature">
+                        <div class="feature-icon">📱</div>
+                        <div class="feature-label">Data</div>
+                        <div class="feature-value">{{ suggested_plan.data.replace('unl', 'unlimited') if suggested_plan.data else 'N/A' }}</div>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">📞</div>
+                        <div class="feature-label">Calls/Text</div>
+                        <div class="feature-value">{{ suggested_plan.calls_text.replace('unl', 'unlimited') if suggested_plan.calls_text else 'N/A' }}</div>
+                    </div>
+                    
+                    {% if suggested_plan.phone_model %}
+                    <div class="feature">
+                        <div class="feature-icon">📲</div>
+                        <div class="feature-label">Phone</div>
+                        <div class="feature-value">{{ suggested_plan.phone_model }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="feature highlight">
+                        <div class="feature-icon">💰</div>
+                        <div class="feature-label">Monthly Price</div>
+                        <div class="feature-value">£{{ suggested_plan.price_per_month }}</div>
+                    </div>
+                </div>
+
+                <div class="action-area">
+                    <p class="satisfaction">This plan matches your requirements perfectly!</p>
+                    <a href="{{ url_for('signup', plan_id=suggested_plan.id) }}" class="btn signup-btn">Sign Up Now</a>
+                </div>
+            </div>
+        </div>
+    {% elif suggested_plan is not none %}
+        <div class="no-plan-found">
+            <h3>No Exact Match Found</h3>
+            <p>We couldn't find a plan that exactly matches your requirements. Here are some suggestions to help you find a suitable plan:</p>
+            <ul>
+                <li>Try reducing your data requirement</li>
+                <li>Consider a plan without a specific phone model</li>
+                <li>Check different call/text packages</li>
+                <li>View all available plans on the <a href="{{ url_for('index') }}">homepage</a></li>
+            </ul>
+            <p style="margin-top: 15px;">Need help? Our suggestions above might help you find a close match!</p>
+        </div>
+    {% endif %}
+
+    <style>
+        .suggest-hero {
+            text-align: center;
+            margin: 30px 0 10px 0;
+            padding: 18px 10px 12px 10px;
+            background: linear-gradient(135deg, #212121 0%, #424242 100%);
+            border-radius: 18px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            border: 1px solid #616161;
+        }
+        .suggest-hero h2 {
+            font-size: 1.7em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .suggest-hero .intro-text {
+            color: #e0e0e0;
+            font-size: 1em;
+            margin-bottom: 0;
+        }
+        .suggest-card {
+            background: linear-gradient(135deg, #212121 0%, #424242 100%);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            padding: 35px 30px 25px 30px;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            border: 1px solid #616161;
+            color: #fff;
+        }
+        .suggestion-form .form-group {
+            margin-bottom: 22px;
+        }
+        .suggestion-form label {
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+        .suggestion-form input,
+        .suggestion-form select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1.5px solid #616161;
+            border-radius: 10px;
+            margin-top: 6px;
+            font-size: 1.08em;
+            background: #fff;
+            color: #222;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        .suggestion-form input:focus,
+        .suggestion-form select:focus {
+            outline: none;
+            border: 1.5px solid #ff5722;
+            box-shadow: 0 0 0 3px rgba(255,87,34,0.2), 0 2px 8px rgba(255,87,34,0.15);
+        }
+        .suggestion-form input::placeholder {
+            color: #888;
+            opacity: 1;
+        }
+        .btn.suggest-plan {
+            background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(255,87,34,0.15);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 0;
+            font-size: 1.15em;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        .btn.suggest-plan:hover {
+            background: transparent;
+            color: #ff5722;
+            border: 2px solid #ff5722;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(255,87,34,0.25);
+        }
+        .info-tip {
+            margin-top: 18px;
+            background: linear-gradient(90deg, #212121 0%, #424242 100%);
+            border-left: 5px solid #ffc107;
+            padding: 12px 18px;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #616161;
+        }
+        .tip-icon {
+            font-size: 1.3em;
+            color: #ffc107;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .help-text {
+            display: block;
+            margin-top: 5px;
+            color: #e0e0e0;
+            font-size: 0.9em;
+        }
+        .intro-text {
+            color: #e0e0e0;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .alert-info {
+            background: linear-gradient(90deg, #212121 0%, #424242 100%);
+            border: 1px solid #616161;
+            color: #e0e0e0;
+        }
+
+        /* New styles for the suggested plan card */
+        .suggested-plan-card {
+            margin-top: 30px;
+            background: linear-gradient(135deg, #212121 0%, #424242 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            overflow: hidden;
+            border: 1px solid #616161;
+        }
+
+        .plan-header {
+            background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .plan-header h3 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .plan-header p {
+            margin: 10px 0 0;
+            opacity: 0.9;
+        }
+
+        .plan-details {
+            padding: 20px;
+            color: #fff;
+        }
+
+        .provider-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .provider-info h4 {
+            color: #fff;
+        }
+
+        .provider-badge {
+            background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature {
+            background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            color: #212121;
+            border: 1px solid #e0e0e0;
+        }
+
+        .feature.highlight {
+            background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+            border: 2px solid #ffc107;
+            color: #fff;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .feature-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .feature.highlight .feature-label {
+            color: #fff;
+            opacity: 0.9;
+        }
+
+        .feature-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .feature.highlight .feature-value {
+            color: #fff;
+        }
+
+        .action-area {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #616161;
+        }
+
+        .satisfaction {
+            color: #4caf50;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .signup-btn {
+            background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+            color: #fff;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(255,87,34,0.15);
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .signup-btn:hover {
+            background: transparent;
+            color: #ff5722;
+            border: 2px solid #ff5722;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(255,87,34,0.25);
+        }
+
+        .no-plan-found {
+            margin-top: 30px; 
+            padding: 20px; 
+            background: linear-gradient(90deg, #212121 0%, #424242 100%); 
+            border: 1px solid #616161; 
+            border-radius: 8px;
+            border-left: 5px solid #ffc107;
+            color: #e0e0e0;
+        }
+
+        .no-plan-found h3 {
+            color: #ffc107; 
+            margin-top: 0;
+        }
+
+        .no-plan-found ul {
+            margin-top: 15px; 
+            color: #e0e0e0;
+        }
+
+        .no-plan-found a {
+            color: #ff5722;
+            text-decoration: underline;
+        }
+
+        .no-plan-found a:hover {
+            color: #ff9800;
+        }
+    </style>
+{% endblock %} 
