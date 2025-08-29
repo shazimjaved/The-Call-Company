@@ -1,7 +1,7 @@
 # The Call Company
 
 A modern Flask web application for comparing and managing mobile network plans.
-![Car Price Predictor](https://github.com/shazimjaved/The-Call-Company/blob/main/tcc1.png)
+![Car Price Predictor](https://github.com/shazimjaved/The-Call-Company/blob/main/tcc1.jpg)
 
 ---
 
